@@ -6,85 +6,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 
-// Mock data for demonstration
-const MOCK_FLAGGED_TICKETS = [
-  {
-    id: "10432",
-    description: "Flagged for token reuse anomaly",
-    timestamp: new Date(Date.now() - 3600000),
-    confidence: 0.87,
-    status: "pending",
-    reasoning: [
-      { step: 1, detail: "Token reuse detected (2x)" },
-      { step: 2, detail: "IP velocity burst detected (15 requests in 2 min)" },
-      { step: 3, detail: "Domain risk score: HIGH (disposable email domain)" },
-      { step: 4, detail: "Geo mismatch: Previous login US, current RO" }
-    ],
-    email: "user@tempmail.net",
-    ip: "198.51.100.23"
-  },
-  {
-    id: "10445",
-    description: "Suspicious verification velocity pattern",
-    timestamp: new Date(Date.now() - 7200000),
-    confidence: 0.92,
-    status: "pending",
-    reasoning: [
-      { step: 1, detail: "50+ verification requests from single IP in 5 minutes" },
-      { step: 2, detail: "User-agent rotation detected (bot-like behavior)" },
-      { step: 3, detail: "All requests to newly registered domains (<7 days old)" }
-    ],
-    email: "test@newdomain123.com",
-    ip: "203.0.113.67"
-  },
-  {
-    id: "10458",
-    description: "DMARC/DKIM failure with high bounce rate",
-    timestamp: new Date(Date.now() - 10800000),
-    confidence: 0.78,
-    status: "pending",
-    reasoning: [
-      { step: 1, detail: "DMARC policy violation detected" },
-      { step: 2, detail: "DKIM signature validation failed" },
-      { step: 3, detail: "Bounce rate for this domain: 45% (threshold: 10%)" }
-    ],
-    email: "admin@suspicious-corp.biz",
-    ip: "192.0.2.89"
-  },
-  {
-    id: "10471",
-    description: "Token brute-force attempt detected",
-    timestamp: new Date(Date.now() - 14400000),
-    confidence: 0.95,
-    status: "pending",
-    reasoning: [
-      { step: 1, detail: "Sequential token guessing pattern detected" },
-      { step: 2, detail: "120 failed confirmation attempts in 10 minutes" },
-      { step: 3, detail: "Source IP on known botnet list" }
-    ],
-    email: "victim@company.com",
-    ip: "198.51.100.142"
-  },
-  {
-    id: "10489",
-    description: "Expired token reuse with geo anomaly",
-    timestamp: new Date(Date.now() - 18000000),
-    confidence: 0.83,
-    status: "pending",
-    reasoning: [
-      { step: 1, detail: "Verification token expired 48 hours ago" },
-      { step: 2, detail: "Reuse attempt from different country (CN vs US)" },
-      { step: 3, detail: "Device fingerprint mismatch" }
-    ],
-    email: "user@legitimate.com",
-    ip: "198.18.0.45"
-  }
-];
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 
 export default function EmailVerificationAgent() {
   const [expandedTickets, setExpandedTickets] = useState({});
   const [feedbackState, setFeedbackState] = useState({});
   const [comments, setComments] = useState({});
+
+  const { data: flaggedTickets = [] } = useQuery({
+    queryKey: ['verificationEvents'],
+    queryFn: () => base44.entities.VerificationEvent.list("-timestamp"),
+    refetchInterval: 30000,
+  });
 
   const toggleTicket = (ticketId) => {
     setExpandedTickets(prev => ({
@@ -100,7 +34,7 @@ export default function EmailVerificationAgent() {
     }));
   };
 
-  const totalFlagged = MOCK_FLAGGED_TICKETS.length;
+  const totalFlagged = flaggedTickets.length;
   const confirmedByHuman = Math.floor(totalFlagged * 0.89);
   
   // Determine color based on count
@@ -185,7 +119,7 @@ export default function EmailVerificationAgent() {
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
-          {MOCK_FLAGGED_TICKETS.map((ticket) => {
+          {flaggedTickets.map((ticket) => {
             const isExpanded = expandedTickets[ticket.id];
             const feedback = feedbackState[ticket.id];
 
@@ -224,8 +158,8 @@ export default function EmailVerificationAgent() {
                       </div>
                       <h4 className="font-medium text-white mb-1">{ticket.description}</h4>
                       <div className="text-xs text-slate-400 space-y-1">
-                        <div>Email: {ticket.email}</div>
-                        <div>IP: {ticket.ip}</div>
+                        <div>Email: <span className="text-slate-300 font-mono">{ticket.email}</span></div>
+                        <div>IP: <span className="text-slate-300 font-mono">{ticket.ip}</span></div>
                         <div>Time: {formatDistanceToNow(ticket.timestamp, { addSuffix: true })}</div>
                       </div>
                     </div>
@@ -242,7 +176,38 @@ export default function EmailVerificationAgent() {
                 {/* Expanded Reasoning Chain */}
                 {isExpanded && (
                   <div className="border-t border-slate-700/50 p-4 bg-slate-900/50">
-                    <h5 className="text-sm font-semibold text-slate-300 mb-3">Reasoning Chain:</h5>
+                    {/* Additional Details */}
+                    <div className="mb-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700/30">
+                      <h5 className="text-sm font-semibold text-slate-300 mb-2">Event Details</h5>
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <span className="text-slate-500">User Agent:</span>
+                          <p className="text-slate-300 font-mono text-[10px] mt-0.5">{ticket.user_agent}</p>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Geo Location:</span>
+                          <p className="text-slate-300 mt-0.5">{ticket.geo_location}</p>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Device Fingerprint:</span>
+                          <p className="text-slate-300 font-mono mt-0.5">{ticket.device_fingerprint}</p>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Verification Attempts:</span>
+                          <p className="text-slate-300 mt-0.5">{ticket.verification_attempts}</p>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Token Age:</span>
+                          <p className="text-slate-300 mt-0.5">{ticket.token_age_minutes} minutes</p>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Domain Age:</span>
+                          <p className="text-slate-300 mt-0.5">{ticket.domain_age_days} days</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h5 className="text-sm font-semibold text-slate-300 mb-3">AI Reasoning Chain:</h5>
                     <div className="space-y-3 mb-4">
                       {ticket.reasoning.map((step) => (
                         <div key={step.step} className="flex gap-3">
