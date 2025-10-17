@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Layout from '../Layout';
-import Dashboard from '../Pages/Home';
-import EmailVerificationAgent from '../Pages/EmailVerificationAgent';
-import EmailRecordingAgent from '../Pages/EmailRecordingAgent';
-import OTTrackingAgent from '../Pages/OTAgent';
+import Layout from './Layout';
+import Dashboard from './Pages/Home';
+import EmailVerificationAgent from './Pages/EmailVerificationAgent';
+import EmailRecordingAgent from './Pages/EmailRecordingAgent';
+import OTTrackingAgent from './Pages/OTAgent';
 
 const queryClient = new QueryClient({
   defaultOptions: {

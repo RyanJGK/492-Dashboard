@@ -42,11 +42,11 @@ npm install
 
 2. **Start the development server:**
 ```bash
-npm start
+npm run dev
 ```
 
 3. **Open your browser:**
-Navigate to `http://localhost:3000`
+Navigate to `http://localhost:5173` (Vite default port)
 
 ## Dashboard Structure
 
