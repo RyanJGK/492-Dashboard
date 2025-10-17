@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Shield, ChevronDown, ChevronUp, CheckCircle, AlertTriangle, MessageSquare, ExternalLink } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "../src/components/ui/card";
+import { Button } from "../src/components/ui/button";
+import { Textarea } from "../src/components/ui/textarea";
+import { Badge } from "../src/components/ui/badge";
+import { formatDistanceToNow } from "../src/lib/utils";
+import TicketDetailModal from "../src/components/TicketDetailModal";
 
 // Mock data for demonstration
 const MOCK_FLAGGED_TICKETS = [
@@ -85,6 +86,7 @@ export default function EmailVerificationAgent() {
   const [expandedTickets, setExpandedTickets] = useState({});
   const [feedbackState, setFeedbackState] = useState({});
   const [comments, setComments] = useState({});
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const toggleTicket = (ticketId) => {
     setExpandedTickets(prev => ({
@@ -229,13 +231,26 @@ export default function EmailVerificationAgent() {
                         <div>Time: {formatDistanceToNow(ticket.timestamp, { addSuffix: true })}</div>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-400 hover:text-slate-200"
-                    >
-                      {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-slate-400 hover:text-slate-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTicket(ticket);
+                        }}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-slate-400 hover:text-slate-200"
+                      >
+                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -356,6 +371,14 @@ export default function EmailVerificationAgent() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Ticket Detail Modal */}
+      {selectedTicket && (
+        <TicketDetailModal 
+          ticket={selectedTicket} 
+          onClose={() => setSelectedTicket(null)} 
+        />
+      )}
     </div>
   );
 }
