@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from "@/components/ui/card";
+import { Card } from "../../src/components/ui/card";
 import { TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 
 export default function KPICard({ 

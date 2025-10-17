@@ -1,12 +1,12 @@
 import React from "react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "../src/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, Server, AlertTriangle, Wifi } from "lucide-react";
-import KPICard from "../components/agents/KPICard";
-import EventTable from "../components/agents/EventTable";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow } from "date-fns";
+import KPICard from "../Components/Agents/KPICard";
+import EventTable from "../Components/Agents/EventTable";
+import { Card, CardContent, CardHeader, CardTitle } from "../src/components/ui/card";
+import { Badge } from "../src/components/ui/badge";
+import { formatDistanceToNow } from "../src/lib/utils";
 
 export default function OTTrackingAgent() {
   const { data: metrics = [] } = useQuery({
