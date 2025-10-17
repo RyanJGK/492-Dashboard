@@ -1,0 +1,46 @@
+{
+    "name": "ComplianceCheck",
+    "type": "object",
+    "properties": {
+      "framework": {
+        "type": "string",
+        "enum": [
+          "NERC_CIP",
+          "IEC_62443",
+          "NIST_SP_800_82"
+        ],
+        "description": "Compliance framework"
+      },
+      "control_id": {
+        "type": "string",
+        "description": "Specific control identifier"
+      },
+      "control_name": {
+        "type": "string",
+        "description": "Name of the control"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "compliant",
+          "non_compliant",
+          "needs_review"
+        ],
+        "default": "needs_review"
+      },
+      "last_checked": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "evidence": {
+        "type": "string",
+        "description": "Evidence or notes about compliance status"
+      }
+    },
+    "required": [
+      "framework",
+      "control_id",
+      "control_name",
+      "status"
+    ]
+  }

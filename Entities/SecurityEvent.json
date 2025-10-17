@@ -1,0 +1,85 @@
+{
+    "name": "SecurityEvent",
+    "type": "object",
+    "properties": {
+      "event_type": {
+        "type": "string",
+        "enum": [
+          "verification_token_reuse",
+          "vr_ip_burst",
+          "email_bounce_spike",
+          "failed_login_burst",
+          "data_integrity_violation",
+          "pii_schema_violation",
+          "ot_protocol_anomaly",
+          "ot_baseline_deviation",
+          "unauthorized_ot_flow"
+        ],
+        "description": "Type of security event detected"
+      },
+      "severity": {
+        "type": "string",
+        "enum": [
+          "critical",
+          "high",
+          "medium",
+          "low"
+        ],
+        "default": "medium"
+      },
+      "source": {
+        "type": "string",
+        "enum": [
+          "email_verification_agent",
+          "email_recording_agent",
+          "ot_tracking_agent"
+        ],
+        "description": "Which agent detected this event"
+      },
+      "description": {
+        "type": "string",
+        "description": "Human-readable description of the event"
+      },
+      "details": {
+        "type": "object",
+        "description": "Additional event metadata",
+        "properties": {
+          "ip": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "asset": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        }
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "open",
+          "investigating",
+          "resolved",
+          "false_positive"
+        ],
+        "default": "open"
+      },
+      "resolved_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "event_type",
+      "severity",
+      "source",
+      "description"
+    ]
+  }

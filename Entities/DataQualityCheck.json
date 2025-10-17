@@ -1,0 +1,55 @@
+{
+    "name": "DataQualityCheck",
+    "type": "object",
+    "properties": {
+      "check_type": {
+        "type": "string",
+        "enum": [
+          "completeness",
+          "consistency",
+          "privacy_violation",
+          "retention_violation",
+          "schema_drift",
+          "referential_integrity"
+        ]
+      },
+      "table_name": {
+        "type": "string",
+        "description": "Database table being checked"
+      },
+      "records_checked": {
+        "type": "integer"
+      },
+      "violations_found": {
+        "type": "integer"
+      },
+      "severity": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ]
+      },
+      "details": {
+        "type": "string",
+        "description": "Details about the violation"
+      },
+      "remediation_status": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "resolved"
+        ],
+        "default": "pending"
+      }
+    },
+    "required": [
+      "check_type",
+      "table_name",
+      "records_checked",
+      "violations_found"
+    ]
+  }

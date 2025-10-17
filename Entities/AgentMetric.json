@@ -1,0 +1,55 @@
+{
+    "name": "AgentMetric",
+    "type": "object",
+    "properties": {
+      "agent_name": {
+        "type": "string",
+        "enum": [
+          "email_verification",
+          "email_recording",
+          "ot_tracking"
+        ],
+        "description": "Which agent this metric belongs to"
+      },
+      "metric_name": {
+        "type": "string",
+        "description": "Name of the metric being tracked"
+      },
+      "metric_value": {
+        "type": "number",
+        "description": "Current value of the metric"
+      },
+      "unit": {
+        "type": "string",
+        "description": "Unit of measurement (%, count, ms, etc)"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "watch",
+          "action"
+        ],
+        "default": "normal",
+        "description": "green=normal, amber=watch, red=action"
+      },
+      "threshold_amber": {
+        "type": "number",
+        "description": "Value at which status becomes 'watch'"
+      },
+      "threshold_red": {
+        "type": "number",
+        "description": "Value at which status becomes 'action'"
+      },
+      "time_window": {
+        "type": "string",
+        "description": "Time window for this metric (e.g., 24h, 5m, 30d)"
+      }
+    },
+    "required": [
+      "agent_name",
+      "metric_name",
+      "metric_value",
+      "status"
+    ]
+  }

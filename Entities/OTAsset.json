@@ -1,0 +1,68 @@
+{
+    "name": "OTAsset",
+    "type": "object",
+    "properties": {
+      "asset_name": {
+        "type": "string",
+        "description": "Name of the OT asset (e.g., HMI-1, PLC-3)"
+      },
+      "ip_address": {
+        "type": "string",
+        "description": "IP address of the asset"
+      },
+      "mac_address": {
+        "type": "string"
+      },
+      "role": {
+        "type": "string",
+        "enum": [
+          "hmi",
+          "plc",
+          "rtu",
+          "historian",
+          "engineering_station",
+          "scada_server"
+        ],
+        "description": "Role of the asset in the OT environment"
+      },
+      "protocol": {
+        "type": "string",
+        "enum": [
+          "modbus",
+          "dnp3",
+          "iec60870",
+          "iec61850",
+          "opcua"
+        ],
+        "description": "Primary protocol used"
+      },
+      "zone": {
+        "type": "string",
+        "description": "Network zone (e.g., Zone 1, DMZ)"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "online",
+          "offline",
+          "anomaly_detected",
+          "baseline_learning"
+        ],
+        "default": "online"
+      },
+      "last_seen": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "baseline_established": {
+        "type": "boolean",
+        "default": false
+      }
+    },
+    "required": [
+      "asset_name",
+      "ip_address",
+      "role",
+      "protocol"
+    ]
+  }

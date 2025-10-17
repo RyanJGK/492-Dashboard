@@ -1,0 +1,59 @@
+{
+    "name": "OTProtocolEvent",
+    "type": "object",
+    "properties": {
+      "protocol": {
+        "type": "string",
+        "enum": [
+          "modbus",
+          "dnp3",
+          "iec60870",
+          "iec61850",
+          "opcua"
+        ]
+      },
+      "source_ip": {
+        "type": "string"
+      },
+      "dest_ip": {
+        "type": "string"
+      },
+      "source_asset": {
+        "type": "string",
+        "description": "Asset name (e.g., PLC-3)"
+      },
+      "dest_asset": {
+        "type": "string"
+      },
+      "function_code": {
+        "type": "string",
+        "description": "Protocol function code"
+      },
+      "register_address": {
+        "type": "integer"
+      },
+      "is_baseline_deviation": {
+        "type": "boolean",
+        "default": false
+      },
+      "is_unauthorized": {
+        "type": "boolean",
+        "default": false
+      },
+      "deviation_type": {
+        "type": "string",
+        "enum": [
+          "timing",
+          "function",
+          "address_range",
+          "new_flow"
+        ],
+        "description": "Type of deviation from baseline"
+      }
+    },
+    "required": [
+      "protocol",
+      "source_ip",
+      "dest_ip"
+    ]
+  }

@@ -1,0 +1,52 @@
+{
+    "name": "VerificationEvent",
+    "type": "object",
+    "properties": {
+      "event_type": {
+        "type": "string",
+        "enum": [
+          "requested",
+          "confirmed",
+          "bounced",
+          "expired"
+        ],
+        "description": "Type of verification event"
+      },
+      "token": {
+        "type": "string",
+        "description": "Verification token (hashed in production)"
+      },
+      "email": {
+        "type": "string",
+        "description": "Email address (hashed in production)"
+      },
+      "domain": {
+        "type": "string",
+        "description": "Email domain"
+      },
+      "ip_address": {
+        "type": "string"
+      },
+      "user_agent": {
+        "type": "string"
+      },
+      "geo_country": {
+        "type": "string"
+      },
+      "is_disposable_domain": {
+        "type": "boolean",
+        "default": false
+      },
+      "abuse_score": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "description": "Risk score 0-100"
+      }
+    },
+    "required": [
+      "event_type",
+      "email",
+      "ip_address"
+    ]
+  }
