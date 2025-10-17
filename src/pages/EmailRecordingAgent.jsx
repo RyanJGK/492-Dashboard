@@ -2,8 +2,8 @@ import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Database, ShieldCheck, AlertTriangle } from "lucide-react";
-import KPICard from "../components/agents/KPICard";
-import EventTable from "../components/agents/EventTable";
+import KPICard from "../Components/Agents/KPICard";
+import EventTable from "../Components/Agents/EventTable";
 import { formatDistanceToNow } from "date-fns";
 
 export default function EmailRecordingAgent() {
@@ -55,8 +55,12 @@ export default function EmailRecordingAgent() {
     { key: 'remediation_status', label: 'Status', render: (e) => e.remediation_status.replace(/_/g, ' ').toUpperCase() },
   ];
 
+  const dataCompleteness = getMetric('data_completeness')?.metric_value || 0;
+  const piiCompliance = getMetric('pii_compliance')?.metric_value || 0;
+  const integrityViolations = getMetric('integrity_violations')?.metric_value || 0;
+
   return (
-    <div className="p-6 md:p-8">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -70,78 +74,93 @@ export default function EmailRecordingAgent() {
         </div>
       </div>
 
-      {/* KPI Panel */}
-      <div className="grid md:grid-cols-5 gap-4 mb-8">
-        <KPICard
-          title="Data Completeness"
-          value={getMetric('data_completeness')?.metric_value || 0}
-          unit="%"
-          status={getMetric('data_completeness')?.status || 'normal'}
-          threshold="< 99% = watch"
-          description="Required fields populated"
-        />
-        <KPICard
-          title="Integrity Violations"
-          value={getMetric('integrity_violations')?.metric_value || 0}
-          status={getMetric('integrity_violations')?.status || 'normal'}
-          threshold="> 0 = action"
-          description="Schema/referential violations"
-        />
-        <KPICard
-          title="PII Compliance"
-          value={getMetric('pii_compliance')?.metric_value || 0}
-          unit="%"
-          status={getMetric('pii_compliance')?.status || 'normal'}
-          threshold="< 100% = action"
-          description="Zero schema violations"
-        />
-        <KPICard
-          title="Retention Violations"
-          value={getMetric('retention_violations')?.metric_value || 0}
-          status={getMetric('retention_violations')?.status || 'normal'}
-          threshold="> 0 = watch"
-          description="Records beyond retention window"
-        />
-        <KPICard
-          title="Failed Login Anomalies"
-          value={getMetric('failed_login_anomalies')?.metric_value || 0}
-          status={getMetric('failed_login_anomalies')?.status || 'normal'}
-          threshold="> 5 = watch"
-          description="Excessive failed login patterns"
-        />
-      </div>
-
-      {/* Privacy & Compliance Status */}
+      {/* 1️⃣ TOP LAYER - Primary KPIs (3 key metrics) */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="p-6 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
-          <div className="flex items-center gap-3 mb-3">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-white font-semibold">Schema Linting</h3>
-          </div>
-          <p className="text-emerald-400 text-2xl font-bold mb-1">ACTIVE</p>
-          <p className="text-slate-400 text-sm">CI pipeline blocks disallowed PII columns</p>
-        </div>
+        <Card className={`${dataCompleteness >= 99 ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-amber-500/5 border-amber-500/20'} border`}>
+          <CardContent className="pt-6 pb-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <div className={`w-2.5 h-2.5 rounded-full ${dataCompleteness >= 99 ? 'bg-emerald-500' : 'bg-amber-500'} animate-pulse`} />
+                <h3 className="text-sm font-medium text-slate-400">DATA COMPLETENESS</h3>
+              </div>
+              <div className={`text-6xl font-bold ${dataCompleteness >= 99 ? 'text-emerald-400' : 'text-amber-400'} mb-2`}>
+                {dataCompleteness.toFixed(1)}%
+              </div>
+              <p className="text-sm text-slate-500">Required fields populated</p>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="p-6 rounded-lg border border-blue-500/20 bg-blue-500/5">
-          <div className="flex items-center gap-3 mb-3">
-            <Database className="w-5 h-5 text-blue-400" />
-            <h3 className="text-white font-semibold">Retention Enforcement</h3>
-          </div>
-          <p className="text-blue-400 text-2xl font-bold mb-1">365 DAYS</p>
-          <p className="text-slate-400 text-sm">Automated purge beyond retention window</p>
-        </div>
+        <Card className={`${piiCompliance === 100 ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'} border`}>
+          <CardContent className="pt-6 pb-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <ShieldCheck className={`w-5 h-5 ${piiCompliance === 100 ? 'text-emerald-400' : 'text-red-400'}`} />
+                <h3 className="text-sm font-medium text-slate-400">PII COMPLIANCE</h3>
+              </div>
+              <div className={`text-6xl font-bold ${piiCompliance === 100 ? 'text-emerald-400' : 'text-red-400'} mb-2`}>
+                {piiCompliance}%
+              </div>
+              <p className="text-sm text-slate-500">Zero schema violations</p>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="p-6 rounded-lg border border-purple-500/20 bg-purple-500/5">
-          <div className="flex items-center gap-3 mb-3">
-            <AlertTriangle className="w-5 h-5 text-purple-400" />
-            <h3 className="text-white font-semibold">Access Control</h3>
-          </div>
-          <p className="text-purple-400 text-2xl font-bold mb-1">ROW-LEVEL</p>
-          <p className="text-slate-400 text-sm">Role-based policies enforced</p>
-        </div>
+        <Card className={`${integrityViolations === 0 ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'} border`}>
+          <CardContent className="pt-6 pb-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <AlertTriangle className={`w-5 h-5 ${integrityViolations === 0 ? 'text-emerald-400' : 'text-red-400'}`} />
+                <h3 className="text-sm font-medium text-slate-400">INTEGRITY VIOLATIONS</h3>
+              </div>
+              <div className={`text-6xl font-bold ${integrityViolations === 0 ? 'text-emerald-400' : 'text-red-400'} mb-2`}>
+                {integrityViolations}
+              </div>
+              <p className="text-sm text-slate-500">Schema/referential issues</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Data Quality Checks */}
+      {/* 2️⃣ MIDDLE LAYER - Compliance Status Cards */}
+      <Card className="border-slate-800/50 bg-slate-900/30 mb-8">
+        <CardHeader>
+          <CardTitle className="text-white text-lg">Compliance Controls</CardTitle>
+          <p className="text-sm text-slate-400 mt-1">Active data governance and privacy policies</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+              <div className="flex items-center gap-3 mb-3">
+                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-white font-semibold text-sm">Schema Linting</h3>
+              </div>
+              <p className="text-emerald-400 text-2xl font-bold mb-1">ACTIVE</p>
+              <p className="text-slate-400 text-xs">CI pipeline blocks disallowed PII columns</p>
+            </div>
+
+            <div className="p-5 rounded-lg border border-blue-500/20 bg-blue-500/5">
+              <div className="flex items-center gap-3 mb-3">
+                <Database className="w-5 h-5 text-blue-400" />
+                <h3 className="text-white font-semibold text-sm">Retention Policy</h3>
+              </div>
+              <p className="text-blue-400 text-2xl font-bold mb-1">365 DAYS</p>
+              <p className="text-slate-400 text-xs">Automated purge beyond retention window</p>
+            </div>
+
+            <div className="p-5 rounded-lg border border-purple-500/20 bg-purple-500/5">
+              <div className="flex items-center gap-3 mb-3">
+                <AlertTriangle className="w-5 h-5 text-purple-400" />
+                <h3 className="text-white font-semibold text-sm">Access Control</h3>
+              </div>
+              <p className="text-purple-400 text-2xl font-bold mb-1">ROW-LEVEL</p>
+              <p className="text-slate-400 text-xs">Role-based policies enforced</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 3️⃣ BOTTOM LAYER - Data Quality Checks Table */}
       <EventTable
         title="Recent Data Quality Checks"
         events={qualityChecks}
